@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Run Command-Line Program</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <form id="form">
+        <input type="text" id="root" placeholder="Enter root (default: ./ragtest)">
+        <input type="text" id="method" placeholder="Enter method (global/local, default: global)">
+        <input type="text" id="question" placeholder="Enter your question" required>
+        <button type="submit">Run</button>
+    </form>
+    <pre id="output"></pre>
+
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
