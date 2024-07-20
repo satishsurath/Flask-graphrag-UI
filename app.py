@@ -2,10 +2,11 @@ from flask import Flask, request, jsonify, render_template
 from threading import Thread
 import subprocess
 import time
+import markdown
 
 app = Flask(__name__)
 
-results = {}pytho
+results = {}
 
 def run_command(root, method, question, task_id):
     process = subprocess.Popen(
@@ -15,7 +16,15 @@ def run_command(root, method, question, task_id):
         text=True
     )
     stdout, stderr = process.communicate()
-    results[task_id] = stdout
+    output = stdout
+
+    # Find the "SUCCESS:" line and add a line break after it
+    if "SUCCESS: Global Search Response:" in output:
+        output = output.replace("SUCCESS: Global Search Response:", "SUCCESS: Global Search Response:\n\n")
+    
+    # Convert the remaining content to Markdown
+    output_html = markdown.markdown(output)
+    results[task_id] = output_html
 
 @app.route('/')
 def index():

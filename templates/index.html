@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Run Command-Line Program</title>
+    <title>Flask-graphrag-UI - Run Command-Line Program via Flask</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
@@ -12,8 +12,40 @@
         <input type="text" id="question" placeholder="Enter your question" required>
         <button type="submit">Run</button>
     </form>
-    <pre id="output"></pre>
+    <div id="output"></div>
 
-    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <script>
+        document.getElementById('form').onsubmit = function(event) {
+            event.preventDefault();
+            const root = document.getElementById('root').value || './ragtest';
+            const method = document.getElementById('method').value || 'global';
+            const question = document.getElementById('question').value;
+
+            fetch('/run', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ root: root, method: method, question: question })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const taskId = data.task_id;
+                checkResult(taskId);
+            });
+        };
+
+        function checkResult(taskId) {
+            fetch('/result/' + taskId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.output === 'Processing') {
+                        setTimeout(() => checkResult(taskId), 1000);
+                    } else {
+                        document.getElementById('output').innerHTML = data.output;
+                    }
+                });
+        }
+    </script>
 </body>
 </html>
