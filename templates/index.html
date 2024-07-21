@@ -7,20 +7,28 @@
 </head>
 <body>
     <form id="form">
-        <input type="text" id="root" placeholder="Enter root (default: ./ragtest)">
-        <input type="text" id="method" placeholder="Enter method (global/local, default: global)">
+        <label for="root">Enter GrapRAG Project Folder:</label>
+        <input type="text" id="root" placeholder="(default: ./ragtest)">
+        <label for="method">Enter method:</label>
+        <input type="text" id="method" placeholder="(global/local, default: global)">
+        <label for="question">Enter your question:</label>
         <input type="text" id="question" placeholder="Enter your question" required>
         <button type="submit">Run</button>
     </form>
-    <div id="output"></div>
-
+    <br><br>
+    <div id="output-container">
+        <h2>Output:</h2>
+        <div id="output"></div>
+    </div>
     <script>
+        let isProcessing = false;
+        let animationInterval;
+
         document.getElementById('form').onsubmit = function(event) {
             event.preventDefault();
             const root = document.getElementById('root').value || './ragtest';
             const method = document.getElementById('method').value || 'global';
-            const question = document.getElementById('question').value;
-
+            const question = document.getElementById('question').value;  
             fetch('/run', {
                 method: 'POST',
                 headers: {
@@ -31,6 +39,9 @@
             .then(response => response.json())
             .then(data => {
                 const taskId = data.task_id;
+                document.getElementById('output').innerHTML = "Processing";
+                isProcessing = true;
+                animateProcessing();
                 checkResult(taskId);
             });
         };
@@ -42,9 +53,23 @@
                     if (data.output === 'Processing') {
                         setTimeout(() => checkResult(taskId), 1000);
                     } else {
+                        isProcessing = false;
+                        clearInterval(animationInterval);
                         document.getElementById('output').innerHTML = data.output;
                     }
                 });
+        }
+
+        function animateProcessing() {
+            animationInterval = setInterval(() => {
+                if (!isProcessing) return;
+                let outputElement = document.getElementById('output');
+                if (outputElement.innerHTML.endsWith("...")) {
+                    outputElement.innerHTML = "Processing";
+                } else {
+                    outputElement.innerHTML += ".";
+                }
+            }, 500); // Update every 500ms
         }
     </script>
 </body>
