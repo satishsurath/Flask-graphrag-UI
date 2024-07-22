@@ -23,10 +23,10 @@ def run_command(root, method, question, task_id):
         output = output.replace("SUCCESS: Global Search Response:", "SUCCESS: Global Search Response:\n\n")
     
     if "creating llm client with {" in output:
-        output = output.replace("creating llm client with {", "creating llm client with \n\n { \n\n")
+        output = output.replace("creating llm client with {", "creating llm client with \n\n the following <details><summary>Settings</summary> { \n\n")
 
     if "}" in output:
-        output = output.replace("}", "\n\n}")
+        output = output.replace("}", "\n\n}</details>")
 
     # Replace key-value pairs with new line and tab indentation
     if "'api_key':" in output:
